@@ -2,7 +2,7 @@
 FROM alpine:latest
 
 # Install inotify-tools and curl
-RUN apk update && apk add inotify-tools curl
+RUN apk update && apk add inotify-tools curl busybox-extras
 
 # Add our monitoring script
 COPY monitor.sh /usr/local/bin/
