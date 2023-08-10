@@ -1,5 +1,10 @@
 #!/bin/sh
 
+# Set trap immediately after the shebang
+trap "rm -f /tmp/script_running" EXIT
+
+echo "Script is running" > /tmp/script_running
+
 EBOOKS_DIR="/ebooks"           # Mount point for eBooks in the container
 AUDIOBOOKS_DIR="/audiobooks"   # Mount point for audiobooks in the container
 

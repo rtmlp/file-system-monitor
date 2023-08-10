@@ -5,10 +5,10 @@ FROM alpine:latest
 RUN apk update && apk add inotify-tools curl
 
 # Add our monitoring script
-COPY monitor_books.sh /usr/local/bin/
+COPY monitor.sh /usr/local/bin/
 
 # Ensure the script is executable
-RUN chmod +x /usr/local/bin/monitor_books.sh
+RUN chmod +x /usr/local/bin/monitor.sh
 
-# Command to run the script
-CMD ["monitor_books.sh"]
+# Start the main script and the HTTP server
+CMD ["sh", "-c", "/usr/local/bin/monitor.sh & busybox httpd -f -p 8080 -h /tmp"]
