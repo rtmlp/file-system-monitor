@@ -5,10 +5,10 @@ FROM alpine:latest
 RUN apk update && apk add inotify-tools curl
 
 # Add our monitoring script
-COPY monitor_ebooks.sh /usr/local/bin/
+COPY monitor_books.sh /usr/local/bin/
 
 # Ensure the script is executable
-RUN chmod +x /usr/local/bin/monitor_ebooks.sh
+RUN chmod +x /usr/local/bin/monitor_books.sh
 
 # Command to run the script
-CMD ["monitor_ebooks.sh"]
+CMD ["monitor_books.sh"]
