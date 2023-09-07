@@ -41,18 +41,35 @@ monitor_directory() {
     TOKEN=$2
     FILETYPES=$3
 
-    # Monitor for create, moved_to, and close_write events
+    # Check if /tmp is writable
+    if [ ! -w "/tmp" ]; then
+        echo "Error: /tmp is not writable."
+        exit 1
+    fi
+
     inotifywait -m -e create,moved_to,close_write -r --format '%w%f' "$DIRECTORY" | while read FILE
     do
-        echo "Detected file event: $FILE"
-        for FILETYPE in $FILETYPES; do
-            if [[ "$FILE" == *.$FILETYPE ]]; then
-                send_notification "$DIRECTORY" "$TOKEN" "$FILE"
-                break
-            fi
-        done
+        # Create a unique identifier for the file including its directory
+        SAFE_FILENAME=$(echo "$DIRECTORY$FILE" | tr -d '/' | tr ' ' '_')
+        TEMP_FILE="/tmp/$SAFE_FILENAME.timestamp"
+
+        # Get the current and last timestamps
+        CURRENT_TIMESTAMP=$(date +%s)
+        LAST_TIMESTAMP=$(cat "$TEMP_FILE" 2>/dev/null || echo "0")
+
+        if [ $(expr $CURRENT_TIMESTAMP - $LAST_TIMESTAMP) -ge 10 ]; then
+            echo "Detected file event: $FILE"
+            for FILETYPE in $FILETYPES; do
+                if [ "${FILE##*.}" = "$FILETYPE" ]; then
+                    send_notification "$DIRECTORY" "$TOKEN" "$FILE"
+                    echo "$CURRENT_TIMESTAMP" > "$TEMP_FILE"
+                    break
+                fi
+            done
+        fi
     done
 }
+
 
 # File extensions to monitor
 EBOOK_EXTENSIONS="epub"
