@@ -41,6 +41,7 @@ monitor_directory() {
     TOKEN=$2
     FILETYPES=$3
 
+    # Monitor for create, moved_to, and close_write events
     inotifywait -m -e create,moved_to,close_write -r --format '%w%f' "$DIRECTORY" | while read FILE
     do
         echo "Detected file event: $FILE"
